@@ -1,0 +1,93 @@
+{
+  "description": "Scout v3 — R8 전략 고정. Phase 1(탐색 5분) + Phase 2(Top 3 분석).",
+  "timing": {
+    "swipe_interval_sec": [
+      2,
+      5
+    ],
+    "round_duration_sec": 300
+  },
+  "efficiency": {
+    "screenshot": true,
+    "record_screen": false,
+    "analysis_top_n": 3
+  },
+  "strategy": {
+    "method": "R8 — 7 keywords, 사진 tab, Row 1+2 scroll, 2-fail skip",
+    "keywords_per_round": 7,
+    "seconds_per_keyword": 45,
+    "proven_keywords": [
+      "Michelangelo art",
+      "art mystery solved",
+      "Dutch Golden Age art",
+      "Monet water lilies",
+      "pre raphaelite art",
+      "Caravaggio painting",
+      "Hieronymus Bosch",
+      "Raphael painting",
+      "El Greco art",
+      "neoclassical painting",
+      "art heist history",
+      "famous portrait history",
+      "famous sculpture history",
+      "Rembrandt painting",
+      "Goya painting",
+      "Turner painting",
+      "Da Vinci secrets",
+      "Botticelli painting",
+      "ancient Greek art",
+      "Rubens painting",
+      "Van Eyck painting",
+      "ancient Roman art",
+      "Hokusai wave",
+      "Cezanne painting",
+      "Hiroshige ukiyo-e",
+      "Rodin sculpture",
+      "Waterhouse painting",
+      "Renaissance Madonna",
+      "Bernini sculpture",
+      "Chinese landscape painting",
+      "Morisot painting",
+      "ancient Egyptian art",
+      "Caravaggio chiaroscuro",
+      "Fayum portrait",
+      "historical portrait colorized",
+      "Raphael school athens",
+      "Vermeer girl pearl earring",
+      "Egyptian tomb painting",
+      "women in art history",
+      "Lapis lazuli art history",
+      "Raphael school athens",
+      "women in art history",
+      "ancient Egyptian art",
+      "Hieronymus Bosch",
+      "painting hidden details"
+    ],
+    "failed_keywords": [
+      "Vermeer painting",
+      "Titian painting",
+      "Manet painting",
+      "Velazquez painting",
+      "Frida Kahlo art",
+      "medieval manuscript art",
+      "art forgery history",
+      "Delacroix painting",
+      "Klimt painting",
+      "Giotto fresco",
+      "Mary Cassatt painting",
+      "impressionist painting",
+      "Mantegna fresco",
+      "Rembrandt night watch",
+      "Turner painting",
+      "historical portrait colorized",
+      "Egyptian tomb painting",
+      "Botticelli painting"
+    ]
+  },
+  "optimization_log": {
+    "description": "각 라운드 후 기록.",
+    "history": []
+  },
+  "current_round": 29,
+  "round_duration_sec": 300
+}
