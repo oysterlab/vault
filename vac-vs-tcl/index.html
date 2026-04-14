@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VAC vs TCL Gemini</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --panel: rgba(255, 255, 255, 0.92);
+      --panel-strong: #ffffff;
+      --line: rgba(15, 23, 42, 0.08);
+      --text: #0f172a;
+      --muted: #64748b;
+      --vac: #3182f6;
+      --vac-soft: #dbeafe;
+      --tcl: #111827;
+      --tcl-soft: #e5e7eb;
+      --negative: #ef4444;
+      --mixed: #f59e0b;
+      --positive: #22c55e;
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background:
+        radial-gradient(circle at top left, rgba(49, 130, 246, 0.10), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.06), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Pretendard Variable", "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      padding: 20px;
+      display: grid;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .slide {
+      width: min(1600px, 96vw);
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 32px 36px 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: auto -60px -60px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(49,130,246,0.08), transparent 68%);
+      pointer-events: none;
+    }
+
+    /* ── Header ── */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(49, 130, 246, 0.08);
+      color: var(--vac);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .header-left { flex: 1; min-width: 0; }
+
+    h1 {
+      margin: 8px 0 6px;
+      font-size: 32px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .sub {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 700px;
+    }
+
+    /* ── Mini cards (header right) ── */
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      min-width: 360px;
+      flex-shrink: 0;
+    }
+
+    .mini-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .mini-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .mini-value {
+      font-size: 13px;
+      line-height: 1.3;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .mini-desc {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    /* ── Main 2-col ── */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .card-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    /* ── Sentiment Legend ── */
+    .legend {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .legend i {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    /* ── Sentiment cards ── */
+    .sentiment-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+    }
+
+    .sentiment-card:last-child { margin-bottom: 0; }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .brand-vac { color: var(--vac); }
+    .brand-tcl { color: var(--tcl); }
+
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stack {
+      height: 26px;
+      width: 100%;
+      background: #edf2f7;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 6px;
+    }
+
+    .segment {
+      height: 100%;
+      cursor: pointer;
+      transition: filter 140ms ease;
+    }
+
+    .segment:hover { filter: brightness(0.95); }
+
+    .neg { background: var(--negative); }
+    .mix { background: var(--mixed); }
+    .pos { background: var(--positive); }
+
+    .stack-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Comparison card ── */
+    .compare-header {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .compare-header .brand {
+      font-size: 12px;
+    }
+
+    .compare-table {
+      display: grid;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .bar-box {
+      display: grid;
+      gap: 3px;
+    }
+
+    .bar-top {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .bar-track {
+      height: 14px;
+      background: #e9eef5;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: filter 140ms ease;
+    }
+
+    .bar-fill:hover { filter: brightness(0.92); }
+
+    .vac-fill { background: linear-gradient(90deg, #60a5fa, var(--vac)); }
+    .tcl-fill { background: linear-gradient(90deg, #9ca3af, #111827); }
+
+    /* ── Footer takeaways ── */
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .takeaway {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .takeaway h3 {
+      font-size: 13px;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .takeaway p {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .source {
+      position: absolute;
+      right: 28px;
+      bottom: 14px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 2
+       ══════════════════════════════════ */
+
+    .s2-header {
+      margin-bottom: 14px;
+    }
+
+    .s2-header h1 {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .s2-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .source-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .source-card h2 {
+      font-size: 16px;
+      letter-spacing: -0.03em;
+      margin-bottom: 3px;
+    }
+
+    .source-card > p {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 7px 6px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: var(--vac);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .list-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.7);
+    }
+
+    .list-item strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .list-item span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    /* ── Tooltip ── */
+    .tooltip {
+      position: fixed;
+      z-index: 20;
+      max-width: 300px;
+      background: rgba(17, 24, 39, 0.96);
+      color: white;
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 120ms ease, transform 120ms ease;
+    }
+
+    .tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tooltip-title {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #dbeafe;
+    }
+
+    .tooltip-body {
+      font-size: 11px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.92);
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════ SLIDE 1 ═══════════════ -->
+  <main class="slide">
+    <section class="header">
+      <div class="header-left">
+        <div class="eyebrow">AI TV UX Comparison</div>
+        <h1>Samsung VAC vs TCL Google TV Gemini</h1>
+        <p class="sub">
+          Reddit에서 두 제품 각각 <strong>실사용 1인칭 경험 50개</strong>를 수집해 비교했다. VAC는 팝업/AI버튼 기능 한정(2025.10~), TCL은 Gemini 통합 경험(2026~).
+          홍보 영상, 보도자료, CES 반응, 구매 전 추측성 댓글은 제외했다.
+        </p>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-card">
+          <div class="mini-label">종합 완성도</div>
+          <div class="mini-value">VAC 2/10 · TCL 3/10</div>
+          <div class="mini-desc">VAC는 침입형 팝업+비활성화 불가, TCL은 setup loop+강제 Gemini 통합이 핵심 감점.</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-label">부정 반응 비율</div>
+          <div class="mini-value">VAC 96% · TCL 80%</div>
+          <div class="mini-desc">Reddit 실사용 표본 기준. 둘 다 부정 우세, 이유가 다르다.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main">
+      <!-- Left: Sentiment -->
+      <article class="card">
+        <h2>실사용 감성 비교</h2>
+        <p class="card-note">Reddit 각 50개 실표본. 구간에 마우스를 올리면 대표 코멘트가 나온다.</p>
+        <div class="legend">
+          <span><i style="background: var(--negative)"></i>부정</span>
+          <span><i style="background: var(--mixed)"></i>혼합</span>
+          <span><i style="background: var(--positive)"></i>긍정</span>
+        </div>
+
+        <div class="sentiment-card">
+          <div class="brand-row">
+            <div class="brand brand-vac"><span class="brand-badge"></span>Samsung VAC</div>
+            <div class="meta">부정 48 · 중립 2 · 긍정 0</div>
+          </div>
+          <div class="stack">
+            <div class="segment neg" style="width:96%" data-title="VAC · 부정 48/50" data-body="대표 불만\n• 시청 중 팝업 + 화면 블랙아웃\n• 게임이 일시정지 안 되고 팝업이 덮어씀\n• 끄는 설정이 없거나 모델별로 다름\n• AI 동의 안 하면 팝업 반복, 동의하면 화면 감시\n• 리모컨에 없는 버튼을 누르라고 안내\n• 마이크가 TV 소리를 명령으로 오인\n\n핵심 인식\n긍정 반응 0건. 'hostile design' 표현이 반복."></div>
+            <div class="segment mix" style="width:4%" data-title="VAC · 중립 2/50" data-body="중립/워크어라운드\n• 물리 마이크 스위치 해결법 공유\n• AI 앱 삭제로 팝업 멈춤 보고\n\n주의\n기능 자체 긍정이 아니라 '덜 거슬리게 만드는 법' 공유."></div>
+          </div>
+          <div class="stack-label">
+            <span>부정 96%</span>
+            <span>중립 4%</span>
+            <span>긍정 0%</span>
+          </div>
+        </div>
+
+        <div class="sentiment-card">
+          <div class="brand-row">
+            <div class="brand brand-tcl"><span class="brand-badge"></span>TCL Gemini</div>
+            <div class="meta">부정 40 · 혼합 5 · 긍정 5</div>
+          </div>
+          <div class="stack">
+            <div class="segment neg" style="width:80%" data-title="TCL · 부정 40/50" data-body="대표 불만\n• Gemini setup 무한 루프 (2월 대규모 발생)\n• 검색과 음성 호출 흐름 꼬임\n• 스마트홈 명령 7~30초 지연\n• Gemini 비활성화 불가, 강제 통합\n\n핵심 인식\n'기본 조작이 이상해졌다'는 반응이 압도적."></div>
+            <div class="segment mix" style="width:10%" data-title="TCL · 혼합 5/50" data-body="혼합 반응\n• TV 하드웨어 만족과 Gemini 만족은 별개\n• Presence sensing은 흥미롭지만 아직 불완전\n• 패치 후 나아졌다는 반응이 일부 존재"></div>
+            <div class="segment pos" style="width:10%" data-title="TCL · 긍정 5/50" data-body="긍정 포인트\n• 기존 Google Assistant보다 낫다는 반응\n• 추천 품질이 기본 Google TV보다 우수\n• 영화 식별 같은 자유 질의는 정확"></div>
+          </div>
+          <div class="stack-label">
+            <span>부정 80%</span>
+            <span>혼합 10%</span>
+            <span>긍정 10%</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Right: Completeness comparison -->
+      <article class="card">
+        <h2>완성도 비교</h2>
+        <p class="card-note">각 막대에 마우스를 올리면 점수 근거가 나온다.</p>
+
+        <!-- Brand legend — shown once, not repeated per row -->
+        <div class="compare-header">
+          <div></div>
+          <div class="brand brand-vac"><span class="brand-badge"></span>Samsung VAC</div>
+          <div class="brand brand-tcl"><span class="brand-badge"></span>TCL Gemini</div>
+        </div>
+
+        <div class="compare-table">
+          <div class="metric-row">
+            <div class="metric-label">기능 개념</div>
+            <div class="bar-box">
+              <div class="bar-top"><span>6/10</span></div>
+              <div class="bar-track"><div class="bar-fill vac-fill" style="width:60%" data-title="VAC · 기능 개념 6/10" data-body="콘텐츠 맥락형 질문 응답 컨셉은 납득 가능.\n하지만 실사용자 반응에서 답변 품질 칭찬은 드물다."></div></div>
+            </div>
+            <div class="bar-box">
+              <div class="bar-top"><span>7/10</span></div>
+              <div class="bar-track"><div class="bar-fill tcl-fill" style="width:70%" data-title="TCL · 기능 개념 7/10" data-body="자유 질의, 추천, 영화 식별 등은 실제로 가능성을 보여줌.\n컨셉 설득력은 TCL/Google 쪽이 약간 더 높다."></div></div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label">UX 완성도</div>
+            <div class="bar-box">
+              <div class="bar-top"><span>2/10</span></div>
+              <div class="bar-track"><div class="bar-fill vac-fill" style="width:20%" data-title="VAC · UX 완성도 2/10" data-body="시청 중 팝업, 블랙아웃, 게임 중단이 반복.\n기능 가치보다 방해감이 먼저 체감된다."></div></div>
+            </div>
+            <div class="bar-box">
+              <div class="bar-top"><span>4/10</span></div>
+              <div class="bar-track"><div class="bar-fill tcl-fill" style="width:40%" data-title="TCL · UX 완성도 4/10" data-body="시청 방해는 VAC보다 약하지만,\n검색하려다 setup으로 튀고 음성 흐름이 꼬인다."></div></div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label">안정성</div>
+            <div class="bar-box">
+              <div class="bar-top"><span>3/10</span></div>
+              <div class="bar-track"><div class="bar-fill vac-fill" style="width:30%" data-title="VAC · 안정성 3/10" data-body="언제, 왜, 어떤 조건에서 나타나는지 예측이 어렵다.\n꺼도 다시 뜬다는 반응이 반복된다."></div></div>
+            </div>
+            <div class="bar-box">
+              <div class="bar-top"><span>4/10</span></div>
+              <div class="bar-track"><div class="bar-fill tcl-fill" style="width:40%" data-title="TCL · 안정성 4/10" data-body="rollout 편차와 setup loop가 문제.\n일부는 패치 후 개선되지만 초기 동작 일관성이 낮다."></div></div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label">통제 가능성</div>
+            <div class="bar-box">
+              <div class="bar-top"><span>2/10</span></div>
+              <div class="bar-track"><div class="bar-fill vac-fill" style="width:20%" data-title="VAC · 통제 가능성 2/10" data-body="모델별 메뉴 차이, 공식 안내 경로 불일치, 다시 뜨는 팝업.\n사용자가 확실히 끌 수 있다는 확신이 낮다."></div></div>
+            </div>
+            <div class="bar-box">
+              <div class="bar-top"><span>4/10</span></div>
+              <div class="bar-track"><div class="bar-fill tcl-fill" style="width:40%" data-title="TCL · 통제 가능성 4/10" data-body="완전히 좋진 않지만 VAC보다는 낫다.\n다만 setup 유도가 기본 흐름에 계속 스며든다."></div></div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label">신뢰감</div>
+            <div class="bar-box">
+              <div class="bar-top"><span>2/10</span></div>
+              <div class="bar-track"><div class="bar-fill vac-fill" style="width:20%" data-title="VAC · 신뢰감 2/10" data-body="'screen monitoring', 'hostile design' 같은 표현이 나옴.\n존재 자체를 꺼버리고 싶다는 반응이 많다."></div></div>
+            </div>
+            <div class="bar-box">
+              <div class="bar-top"><span>5/10</span></div>
+              <div class="bar-track"><div class="bar-fill tcl-fill" style="width:50%" data-title="TCL · 신뢰감 5/10" data-body="TV에서 Gemini를 원치 않는다는 반응도 있지만,\n실제로 더 유용하다는 평가가 일부 존재한다."></div></div>
+            </div>
+          </div>
+
+          <div class="metric-row" style="padding-top:6px; border-top: 1px solid var(--line);">
+            <div class="metric-label" style="font-size:13px;">종합 완성도</div>
+            <div class="bar-box">
+              <div class="bar-top"><span style="font-size:13px; color:var(--vac);">2/10</span></div>
+              <div class="bar-track" style="height:18px;"><div class="bar-fill vac-fill" style="width:20%" data-title="VAC · 종합 완성도 2/10" data-body="부정 96%, 긍정 0%. 비활성화 불가.\n사용자가 유용성을 평가하기 전에 먼저 거부감을 느낀다."></div></div>
+            </div>
+            <div class="bar-box">
+              <div class="bar-top"><span style="font-size:13px; color:var(--tcl);">3/10</span></div>
+              <div class="bar-track" style="height:18px;"><div class="bar-fill tcl-fill" style="width:30%" data-title="TCL · 종합 완성도 3/10" data-body="2월 대규모 setup loop 버그로 부정률 80%.\n기능 잠재력은 있지만 강제 통합과 불안정성이 문제."></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="footer-grid">
+      <div class="takeaway">
+        <h3>Samsung VAC</h3>
+        <p>자발적 사용 긍정 0건. 팝업이 시청을 끊고, 끄는 방법이 없고, 동의해야 멈추는 구조. 'hostile design' 표현 반복.</p>
+      </div>
+      <div class="takeaway">
+        <h3>TCL Gemini</h3>
+        <p>자발적 사용 긍정 5건(영화 트리비아, 추천 등). setup loop 대란이 부정률을 끌어올렸지만 기능 자체 호평이 일부 존재.</p>
+      </div>
+      <div class="takeaway">
+        <h3>한 줄 판단</h3>
+        <p>VAC는 자발적으로 쓴 사람조차 Reddit에 없다. TCL은 극소수지만 "써보니 괜찮다"가 있다. 둘 다 제품화 마감이 문제.</p>
+      </div>
+    </section>
+
+    <div class="source">Slide 1 · comparative summary · Reddit 50 samples each · 2025.10~2026.04</div>
+  </main>
+
+  <!-- ═══════════════ SLIDE 2 ═══════════════ -->
+  <main class="slide">
+    <section class="s2-header">
+      <div class="eyebrow">Research Method</div>
+      <h1>표본은 어디서, 몇 개를, 어떤 내용으로 모았는가</h1>
+      <p class="sub">
+        Reddit의 <strong>실사용 1인칭 경험</strong>만 수집했다. 홍보 영상, 보도자료, 체험존 반응, 구매 전 추측성 댓글은 제외했다.
+      </p>
+    </section>
+
+    <div class="s2-body">
+      <!-- Top-left: Source table -->
+      <article class="source-card">
+        <h2>수집 출처와 개수</h2>
+        <p>VAC는 팝업/AI버튼 기능 한정, TCL은 Gemini 통합 경험 기준.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>제품</th>
+              <th>주요 출처</th>
+              <th>표본</th>
+              <th>핵심 수집 내용</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pill">Samsung VAC</span></td>
+              <td>r/techsupport, r/SamsungTV, r/OLED, r/OLED_Gaming, r/4kTV, r/TheFrame, r/mildlyinfuriating</td>
+              <td><strong>50개</strong></td>
+              <td>AI 팝업 중단, 블랙스크린, 비활성화 불가, 강제 동의, 마이크 오인식</td>
+            </tr>
+            <tr>
+              <td><span class="pill" style="background:#f3f4f6; color:#111827;">TCL Gemini</span></td>
+              <td>r/tcltvs, r/GoogleTV, r/googlehome, r/AndroidTV</td>
+              <td><strong>50개</strong></td>
+              <td>setup loop, 검색 방해, 음성 호출 꼬임, rollout 편차, 제한적 호평</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 12px;">
+          <h2 style="margin-bottom: 6px;">선별 기준</h2>
+          <div class="list">
+            <div class="list-item">
+              <strong>포함</strong>
+              <span>실제 구매 또는 사용 후 남긴 1인칭 경험, 문제 재현, 해결 시도, 반품 여부, 패치 후 변화.</span>
+            </div>
+            <div class="list-item">
+              <strong>제외</strong>
+              <span>홍보 영상, 공식 발표, 언론 요약, 안 써본 사람의 일반론, 구매 상담, 봇/자동 댓글.</span>
+            </div>
+            <div class="list-item">
+              <strong>주의</strong>
+              <span>유튜브 댓글과 X는 안정적으로 대량 수집이 어려워 비율 계산에는 넣지 않았다.</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Top-right + Bottom merged: Content summaries -->
+      <article class="source-card">
+        <h2>Samsung VAC에서 모인 내용</h2>
+        <div class="list" style="margin-bottom: 14px;">
+          <div class="list-item">
+            <strong>시청 중 강제 중단</strong>
+            <span>게임/스트리밍 중 AI 팝업이 화면을 블랙아웃시키고, 게임은 일시정지도 안 된 채 덮어쓴다.</span>
+          </div>
+          <div class="list-item">
+            <strong>비활성화 불가</strong>
+            <span>설정 끄기, 앱 삭제, 공장초기화 모두 실패. 유일한 해결은 물리 마이크 스위치뿐.</span>
+          </div>
+          <div class="list-item">
+            <strong>강제 동의 구조</strong>
+            <span>팝업을 멈추려면 AI 화면 감시에 동의해야 한다. 'hostile design' 표현이 반복됐다.</span>
+          </div>
+        </div>
+
+        <h2>TCL Gemini에서 모인 내용</h2>
+        <div class="list">
+          <div class="list-item">
+            <strong>Setup loop</strong>
+            <span>앱 검색이나 음성 버튼 입력이 Gemini 설정 화면으로 계속 되돌아간다는 반응이 있었다.</span>
+          </div>
+          <div class="list-item">
+            <strong>통합 마감 문제</strong>
+            <span>Assistant와 Gemini의 역할이 충돌하고, 일부 모델에서는 블랙스크린이나 슬로우다운도 보고됐다.</span>
+          </div>
+          <div class="list-item">
+            <strong>잠재력 인정</strong>
+            <span>기존 Google Assistant보다 더 낫다, 질문 응답과 추천이 괜찮다는 제한적 호평도 일부 있었다.</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="source">Slide 2 · source mix, sample size, inclusion criteria</div>
+  </main>
+
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip">
+    <div class="tooltip-title" id="tooltip-title"></div>
+    <div class="tooltip-body" id="tooltip-body"></div>
+  </div>
+
+  <script>
+    const tooltip = document.getElementById('tooltip');
+    const tooltipTitle = document.getElementById('tooltip-title');
+    const tooltipBody = document.getElementById('tooltip-body');
+
+    function showTooltip(event) {
+      const target = event.currentTarget;
+      tooltipTitle.textContent = target.dataset.title || '';
+      tooltipBody.textContent = (target.dataset.body || '').replace(/\\n/g, '\n');
+      tooltip.classList.add('show');
+      moveTooltip(event);
+    }
+
+    function moveTooltip(event) {
+      const gap = 16;
+      const tw = tooltip.offsetWidth || 260;
+      const th = tooltip.offsetHeight || 100;
+      let x = event.clientX + gap;
+      let y = event.clientY + gap;
+      if (x + tw > window.innerWidth - 12) x = event.clientX - tw - gap;
+      if (y + th > window.innerHeight - 12) y = event.clientY - th - gap;
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+    }
+
+    function hideTooltip() {
+      tooltip.classList.remove('show');
+    }
+
+    document.querySelectorAll('[data-title]').forEach((el) => {
+      el.addEventListener('mouseenter', showTooltip);
+      el.addEventListener('mousemove', moveTooltip);
+      el.addEventListener('mouseleave', hideTooltip);
+    });
+  </script>
+</body>
+</html>
