@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scout Learning Journey</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#000; font-family:'Inter',sans-serif; overflow:hidden; }
+
+  .deck { width:100vw; height:100vh; }
+  .slide {
+    width:100vw; height:100vh; position:absolute; top:0; left:0;
+    display:none; flex-direction:column; justify-content:center;
+    padding: 64px 80px; overflow:hidden;
+  }
+  .slide.active { display:flex; }
+
+  /* nav */
+  .nav { position:fixed; bottom:28px; right:40px; z-index:100; display:flex; gap:8px; align-items:center; }
+  .nav button { background:transparent; border:1px solid #333; color:#666; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:16px; transition:.2s; }
+  .nav button:hover { border-color:#555; color:#aaa; }
+  .nav .counter { color:#444; font-size:11px; font-variant-numeric:tabular-nums; margin-right:8px; }
+  .dots { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:100; }
+  .dot { width:5px; height:5px; border-radius:50%; background:#222; transition:.3s; cursor:pointer; }
+  .dot.active { background:#6ee7b7; width:18px; border-radius:3px; }
+
+  /* typography */
+  h1 { font-size:52px; font-weight:800; color:#fff; line-height:1.1; letter-spacing:-1.5px; }
+  h2 { font-size:36px; font-weight:700; color:#fff; line-height:1.15; letter-spacing:-0.5px; }
+  .overline { font-size:11px; font-weight:600; color:#6ee7b7; letter-spacing:3px; text-transform:uppercase; margin-bottom:12px; }
+  p { font-size:16px; color:#888; line-height:1.7; }
+  .large-p { font-size:18px; color:#999; line-height:1.7; }
+  .accent { color:#6ee7b7; }
+  .yellow { color:#fbbf24; }
+  .red { color:#ef4444; }
+  .white { color:#fff; }
+  .dim { color:#444; }
+
+  /* layout */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; height:100%; }
+  .two-col-narrow { display:grid; grid-template-columns:1.2fr 0.8fr; gap:56px; align-items:center; height:100%; }
+
+  .phone-frame {
+    width:160px; height:320px; border-radius:16px; border:1.5px solid #2a2a2a;
+    overflow:hidden; background:#0a0a0a; flex-shrink:0;
+  }
+  .phone-frame img { width:100%; height:100%; object-fit:cover; }
+  .phone-row { display:flex; gap:14px; justify-content:center; }
+  .phone-label { font-size:10px; color:#555; margin-top:6px; text-align:center; letter-spacing:0.5px; }
+
+  .metric { text-align:center; }
+  .metric .val { font-size:48px; font-weight:800; color:#fff; letter-spacing:-1px; }
+  .metric .label { font-size:10px; color:#555; margin-top:2px; text-transform:uppercase; letter-spacing:1.5px; }
+  .metric-row { display:flex; gap:40px; }
+
+  .insight {
+    border-left: 2px solid #6ee7b7; padding-left:20px; margin-top:24px;
+  }
+  .insight p { color:#aaa; font-size:15px; line-height:1.6; }
+  .insight strong { color:#6ee7b7; }
+
+  .code-block {
+    background:#111; border:1px solid #1a1a1a; border-radius:8px;
+    padding:16px 20px; font-family:'SF Mono','Fira Code',monospace; font-size:12px;
+    color:#6ee7b7; line-height:1.8;
+  }
+
+  .cycle-step {
+    display:flex; align-items:center; gap:12px; padding:12px 0;
+    border-bottom:1px solid #151515;
+  }
+  .cycle-num { width:28px; height:28px; border-radius:50%; background:#1a1a1a; color:#666;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0; }
+  .cycle-num.active { background:#6ee7b722; color:#6ee7b7; border:1px solid #6ee7b744; }
+  .cycle-text { font-size:13px; color:#888; }
+  .cycle-text strong { color:#ccc; }
+
+  .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; }
+  .compare-cell { padding:16px 20px; background:#111; }
+  .compare-cell:first-child { border-radius:8px 0 0 0; }
+  .compare-cell:nth-child(2) { border-radius:0 8px 0 0; }
+  .compare-cell:nth-child(3) { border-radius:0 0 0 8px; }
+  .compare-cell:last-child { border-radius:0 0 8px 0; }
+  .compare-header { font-size:10px; color:#555; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+
+  .playbook-entry {
+    background:#0d0d0d; border:1px solid #1a1a1a; border-radius:8px;
+    padding:16px 20px; margin-bottom:8px;
+  }
+  .playbook-round { font-size:10px; color:#555; letter-spacing:1px; }
+  .playbook-content { font-size:13px; color:#999; margin-top:4px; line-height:1.5; }
+  .playbook-content strong { color:#fff; }
+  .playbook-content .g { color:#6ee7b7; }
+  .playbook-content .r { color:#ef4444; }
+
+  canvas { max-height:300px; }
+
+  .pb-raw { transition: all 0.3s; }
+  .pb-open { display:block !important; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- 0: Title -->
+<div class="slide active" data-idx="0" style="background:linear-gradient(160deg,#050505,#0a0a0a);">
+  <div style="max-width:640px;">
+    <div class="overline">Case Study</div>
+    <h1 style="margin-bottom:20px;">AI가 TikTok을<br>스스로 배워가는 과정</h1>
+    <p class="large-p">
+      아무것도 모르는 상태에서 시작해서<br>
+      8라운드(40분) 만에 탐색 효율을 <span class="accent">2.4배</span> 끌어올린 기록.
+    </p>
+  </div>
+</div>
+
+<!-- 1: Karpathy's Autoresearch -->
+<div class="slide" data-idx="1" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">Origin Story</div>
+      <h2 style="margin-bottom:16px;">Andrej Karpathy의<br>Autoresearch</h2>
+      <p style="margin-bottom:16px;">
+        2026년 3월, 전 Tesla AI 디렉터 <strong class="white">Andrej Karpathy</strong>가<br>
+        GitHub에 공개한 프로젝트. 한 달 만에 별 6만 개.
+      </p>
+      <p style="margin-bottom:16px;">
+        원래 AI 모델을 학습시키려면 사람이 직접 설정을 바꾸고,<br>
+        실험을 돌리고, 결과를 확인하고, 다시 바꾸는 걸 반복합니다.<br>
+        Karpathy는 이 과정 전체를 <strong class="white">AI가 혼자서 반복</strong>하게 만들었습니다.
+      </p>
+      <p style="margin-bottom:16px;">
+        사람이 퇴근한 뒤에도 AI가 밤새 실험을 돌립니다.<br>
+        <strong class="white">결과가 나아지면 유지하고, 아니면 되돌리고, 다시 시도.</strong><br>
+        8시간 동안 약 100번. 아침에 출근하면<br>
+        어젯밤보다 <span class="accent">성능이 개선된 결과</span>가 기다립니다.
+      </p>
+      <div class="insight">
+        <p>사람의 역할이 바뀝니다.<br>
+        직접 실험하는 사람에서 → <strong>"AI에게 뭘 시도하라고 지시하는 사람"</strong>으로.</p>
+      </div>
+    </div>
+    <div>
+      <div style="padding:24px;background:#111;border-radius:12px;border:1px solid #1a1a1a;">
+        <p style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:16px;text-transform:uppercase;">Autoresearch 루프</p>
+        <div class="cycle-step">
+          <div class="cycle-num">1</div>
+          <div class="cycle-text"><strong>수정</strong> — AI가 설정을 한 군데 바꿈</div>
+        </div>
+        <div class="cycle-step">
+          <div class="cycle-num">2</div>
+          <div class="cycle-text"><strong>실험</strong> — 5분간 돌려서 성능 측정</div>
+        </div>
+        <div class="cycle-step">
+          <div class="cycle-num">3</div>
+          <div class="cycle-text"><strong>판단</strong> — 나아졌으면 유지, 아니면 되돌림</div>
+        </div>
+        <div class="cycle-step" style="border:none;">
+          <div class="cycle-num">4</div>
+          <div class="cycle-text"><strong>반복</strong> — 밤새 100번 자동 반복</div>
+        </div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #2a2a2a;">
+          <p style="font-size:12px;color:#888;">
+            핵심은 <strong class="white">"바꾸고 → 측정하고 → 판단하는"</strong> 루프를<br>
+            사람 없이 자동으로 계속 돌린다는 것.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2: Shopify case + TikTok application -->
+<div class="slide" data-idx="2" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">Who's using it</div>
+      <h2 style="margin-bottom:16px;">Shopify CEO가<br>하룻밤에 증명했다</h2>
+      <p style="margin-bottom:16px;">
+        Shopify CEO <strong class="white">Tobias Lutke</strong>가<br>
+        자사 검색 시스템에 autoresearch를 적용했습니다.<br>
+        퇴근 전에 켜놓고, 다음 날 아침에 결과를 확인.
+      </p>
+      <p style="margin-bottom:16px;">
+        8시간 동안 37번의 자동 실험이 돌았고,<br>
+        절반 크기의 작은 모델이 기존보다<br>
+        <strong class="white">성능 19% 향상</strong>된 채로 기다리고 있었습니다.
+      </p>
+      <p style="font-size:14px;color:#888;font-style:italic;margin-bottom:20px;">
+        "몇 달간 팀이 못 한 걸 하룻밤에 해냈다"
+      </p>
+      <p style="margin-bottom:16px;">
+        이후 마케팅 에이전시들이 광고 카피와 랜딩페이지에,<br>
+        미디어 회사들이 검색 알고리즘에 같은 방식을 적용하기 시작했습니다.<br>
+        <strong class="white">"바꾸고 → 측정 → 판단" 루프는 어디에든 적용 가능</strong>하다는 게 증명된 것.
+      </p>
+      <div class="insight">
+        <p>우리는 이걸 <strong>TikTok 콘텐츠 제작</strong>에 적용했습니다.<br>
+        AI가 콘텐츠를 만들고 → 올리고 → 반응 측정 → 개선을 하루 2번 자동으로.<br>
+        하지만 한 가지가 빠져 있었습니다 —</p>
+      </div>
+    </div>
+    <div>
+      <div style="padding:24px;background:#111;border-radius:12px;border:1px solid #1a1a1a;margin-bottom:16px;">
+        <p style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;">Shopify 실험 결과</p>
+        <div style="display:flex;gap:24px;margin-bottom:16px;">
+          <div class="metric"><div class="val accent" style="font-size:36px;">37</div><div class="label">자동 실험</div></div>
+          <div class="metric"><div class="val yellow" style="font-size:36px;">8h</div><div class="label">소요 시간</div></div>
+          <div class="metric"><div class="val accent" style="font-size:36px;">+19%</div><div class="label">성능 향상</div></div>
+        </div>
+        <div style="border-top:1px solid #1a1a1a;padding-top:12px;">
+          <p style="font-size:11px;color:#555;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">TikTok에 같은 방식을 적용</p>
+          <div class="cycle-step">
+            <div class="cycle-num">1</div>
+            <div class="cycle-text"><strong>측정</strong> — 어제 올린 콘텐츠의 반응</div>
+          </div>
+          <div class="cycle-step">
+            <div class="cycle-num">2</div>
+            <div class="cycle-text"><strong>기획</strong> — 다음 콘텐츠 3개 설계</div>
+          </div>
+          <div class="cycle-step">
+            <div class="cycle-num">3</div>
+            <div class="cycle-text"><strong>제작 + 검수</strong> — 자동 생성, 품질 확인</div>
+          </div>
+          <div class="cycle-step" style="border:none;">
+            <div class="cycle-num">4</div>
+            <div class="cycle-text"><strong>업로드</strong> — TikTok에 자동 게시 → 반복</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:12px 16px;background:#0d0d0d;border:1px dashed #ef444444;border-radius:8px;">
+        <p style="font-size:12px;color:#ef4444;font-weight:600;margin-bottom:4px;">빠진 것</p>
+        <p style="font-size:12px;color:#888;">
+          자기 콘텐츠만 분석. 지금 TikTok에서 뭐가 잘 되는지는 모름.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3: Scout = The Missing Piece -->
+<div class="slide" data-idx="3" style="background:#050505;">
+  <div class="two-col-narrow">
+    <div>
+      <div class="overline">The Missing Piece</div>
+      <h2 style="margin-bottom:16px;">시장을 직접 보는 눈 —<br>Scout</h2>
+      <p style="margin-bottom:16px;">
+        자기 데이터만 보면 "왜 안 되는지"는 알 수 있지만<br>
+        <strong class="white">"지금 뭐가 되고 있는지"</strong>는 알 수 없습니다.
+      </p>
+      <p style="margin-bottom:16px;">
+        72만 좋아요를 받는 포스트가 어떤 형식인지,<br>
+        어떤 화가를 다루면 반응이 좋은지,<br>
+        경쟁자들은 어떤 전략을 쓰는지.
+      </p>
+      <p style="margin-bottom:16px;">
+        그래서 <strong class="accent">Scout</strong>를 추가했습니다.<br>
+        AI가 직접 TikTok을 열고, 잘 되는 콘텐츠를 찾아서<br>
+        그 전략을 분석하고, 우리 제작에 반영하는 단계.
+      </p>
+      <div class="insight">
+        <p>Karpathy의 autoresearch가 "밤새 코드를 개선하는 루프"라면,<br>
+        Scout는 <strong>"5분마다 TikTok을 훑고, 매번 더 잘 훑는 법을 배우는 루프"</strong>입니다.<br>
+        다음 슬라이드부터 그 학습 과정을 보여드립니다.</p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div style="padding:24px;background:#111;border-radius:12px;border:1px solid #1a1a1a;">
+        <p style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:16px;text-transform:uppercase;">Before vs After</p>
+        <div style="margin-bottom:16px;">
+          <p style="font-size:11px;color:#ef4444;font-weight:600;margin-bottom:6px;">BEFORE</p>
+          <p style="font-size:13px;color:#888;">자기 데이터만 보고 다음 콘텐츠 기획<br><span class="dim">"왜 안 되는지"는 알지만 "뭐가 되는지"는 모름</span></p>
+        </div>
+        <div style="width:40px;height:1px;background:#2a2a2a;margin:16px auto;"></div>
+        <div>
+          <p style="font-size:11px;color:#6ee7b7;font-weight:600;margin-bottom:6px;">AFTER</p>
+          <p style="font-size:13px;color:#888;">
+            <span class="accent">Scout가 TikTok 직접 탐색</span><br>
+            → 잘 되는 콘텐츠의 전략 분석<br>
+            → 우리 콘텐츠에 적용 → 측정 → 반복
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3: How Scout works -->
+<div class="slide" data-idx="4" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">How it works</div>
+      <h2 style="margin-bottom:16px;">AI가 실제 스마트폰을<br>직접 조작합니다</h2>
+      <p style="margin-bottom:24px;">
+        사람이 TikTok을 보듯이 — 검색하고, 탭하고, 스크롤하고,<br>
+        좋아요 수를 확인합니다. 다만 사람 대신 AI가 합니다.
+      </p>
+      <div class="cycle-step">
+        <div class="cycle-num">1</div>
+        <div class="cycle-text"><strong>검색</strong> — 키워드를 입력하고 "사진" 탭을 누름</div>
+      </div>
+      <div class="cycle-step">
+        <div class="cycle-num">2</div>
+        <div class="cycle-text"><strong>탐색</strong> — 목록에서 포스트를 하나씩 열어봄</div>
+      </div>
+      <div class="cycle-step">
+        <div class="cycle-num">3</div>
+        <div class="cycle-text"><strong>수집</strong> — 좋아요, 댓글, 공유 수를 기록</div>
+      </div>
+      <div class="cycle-step">
+        <div class="cycle-num active">4</div>
+        <div class="cycle-text"><strong>기록</strong> — 배운 것을 <span class="accent">Playbook</span>에 남김</div>
+      </div>
+      <div class="cycle-step" style="border:none;">
+        <div class="cycle-num active">5</div>
+        <div class="cycle-text"><strong>반복</strong> — 다음 라운드는 Playbook을 읽고 시작</div>
+      </div>
+      <div class="insight" style="margin-top:20px;">
+        <p><strong>Playbook</strong>은 매 라운드가 끝날 때마다 AI가 직접 쓰는 노트입니다.<br>
+        "이번에 뭐가 됐고, 뭐가 안 됐고, 다음엔 어떻게 하자"를 기록하면<br>
+        다음 라운드의 AI가 그 노트를 읽고 더 나은 판단을 합니다.</p>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:10px;color:#444;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">AI가 조작하는 실제 화면</p>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r1_t160.jpg" alt="검색 결과"></div>
+          <div class="phone-label">검색 결과 탐색</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r1_t240.jpg" alt="포스트 내부"></div>
+          <div class="phone-label">포스트 열어서 확인</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r4_hit.jpg" alt="데이터 수집"></div>
+          <div class="phone-label">15.7만 좋아요 포착</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2: R1 -->
+<div class="slide" data-idx="5" style="background:#050505;">
+  <div class="two-col-narrow">
+    <div>
+      <div class="overline">Round 1 — 첫 시도</div>
+      <h2 style="margin-bottom:16px;"><span class="red">10개</span> 발견</h2>
+      <p style="margin-bottom:20px;">
+        "famous painting facts"를 검색해서 사진 탭을 찾고,<br>
+        포스트를 열어보는 기본 흐름을 처음으로 익혔습니다.
+      </p>
+      <p style="margin-bottom:20px;color:#ef4444;font-size:14px;">
+        하지만 두 가지 문제를 발견:
+      </p>
+      <div style="padding-left:16px;border-left:2px solid #ef4444;margin-bottom:16px;">
+        <p style="font-size:13px;color:#ccc;margin-bottom:6px;">
+          <strong>1. 같은 포스트를 반복해서 열게 됨</strong><br>
+          <span style="color:#666;">포스트를 보고 뒤로 돌아오면 목록이 처음으로 리셋됨</span>
+        </p>
+        <p style="font-size:13px;color:#ccc;">
+          <strong>2. 검색어가 2개뿐</strong><br>
+          <span style="color:#666;">다양한 콘텐츠를 만나지 못함</span>
+        </p>
+      </div>
+      <div class="insight">
+        <p><strong>Playbook에 기록:</strong><br>
+        "뒤로 돌아오면 목록이 리셋된다."</p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div class="metric-row" style="justify-content:center;margin-bottom:24px;">
+        <div class="metric"><div class="val" style="color:#ef4444;">10</div><div class="label">발견</div></div>
+        <div class="metric"><div class="val dim">5:00</div><div class="label">소요</div></div>
+      </div>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r1_t160.jpg" alt="R1 목록"></div>
+          <div class="phone-label">검색 결과 목록</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r1_t200.jpg" alt="R1 같은 목록"></div>
+          <div class="phone-label">뒤로 오면 다시 처음</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3: R2 -->
+<div class="slide" data-idx="6" style="background:#050505;">
+  <div class="two-col-narrow">
+    <div>
+      <div class="overline">Round 2 — 새로운 벽</div>
+      <h2 style="margin-bottom:16px;"><span class="red">7개</span> — 오히려 줄었다</h2>
+      <p style="margin-bottom:16px;">
+        R1의 Playbook을 읽고 검색어를 3개로 늘렸지만,<br>
+        R1보다 오히려 적게 찾았습니다.
+      </p>
+      <p style="margin-bottom:16px;">
+        R1의 중복 문제에 더해 <strong class="white">새로운 문제 2개</strong>를 발견:
+      </p>
+      <div style="padding-left:16px;border-left:2px solid #ef4444;margin-bottom:16px;">
+        <p style="font-size:13px;color:#ccc;margin-bottom:8px;">
+          <strong>좋아요·댓글·공유 수를 읽을 수 없음</strong><br>
+          <span style="color:#666;">화면에는 "30.8만" 같은 숫자가 보이는데,<br>
+          AI가 데이터로 가져오면 전부 빈 칸.</span>
+        </p>
+        <p style="font-size:13px;color:#ccc;">
+          <strong>"사진" 탭의 위치가 R1과 달라짐</strong><br>
+          <span style="color:#666;">R1에서 기록한 좌표를 눌렀더니 엉뚱한 탭이 열림.</span>
+        </p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div class="metric-row" style="justify-content:center;margin-bottom:24px;">
+        <div class="metric"><div class="val" style="color:#ef4444;">7</div><div class="label">발견</div></div>
+        <div class="metric"><div class="val dim">4:30</div><div class="label">소요</div></div>
+      </div>
+      <div style="padding:16px;background:#111;border-radius:8px;border:1px solid #1a1a1a;margin-bottom:16px;text-align:left;">
+        <p style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:6px;">미해결 문제 목록</p>
+        <p style="font-size:12px;color:#ef4444;margin-bottom:3px;">1. 같은 포스트 반복 열기 <span class="dim">(R1에서)</span></p>
+        <p style="font-size:12px;color:#ef4444;margin-bottom:3px;">2. 좋아요 수 못 읽기 <span class="dim">(새로 발견)</span></p>
+        <p style="font-size:12px;color:#ef4444;">3. "사진" 탭 위치 변동 <span class="dim">(새로 발견)</span></p>
+      </div>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r2_bug.jpg" alt="R2"></div>
+          <div class="phone-label">숫자가 보이지만 읽을 수 없음</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4: R3 -->
+<div class="slide" data-idx="7" style="background:#050505;">
+  <div class="two-col-narrow">
+    <div>
+      <div class="overline">Round 3 — 첫 번째 돌파</div>
+      <h2 style="margin-bottom:16px;"><span class="yellow">9개</span> — 그리고 코드를 해독하다</h2>
+      <p style="margin-bottom:16px;">
+        R2의 Playbook에 "좋아요 수를 읽을 수 없다"는 문제가 기록되어 있었고,<br>
+        이번 라운드에서 <strong class="white">XML 구조를 분석해서 해독에 성공</strong>했습니다.
+      </p>
+      <div class="code-block" style="font-size:11px;margin-bottom:16px;">
+        <span style="color:#555;">// R3에서 XML을 분석해 알아낸 TikTok 코드</span><br><br>
+        <span style="color:#fbbf24;">qmd</span> → 좋아요 수 &nbsp;(예: "30.8만")<br>
+        <span style="color:#fbbf24;">qm_</span> → 댓글 수 &nbsp;&nbsp;(예: "582")<br>
+        <span style="color:#fbbf24;">qmi</span> → 공유 수 &nbsp;&nbsp;(예: "2.6만")<br>
+        <span style="color:#fbbf24;">qml</span> → 저장 수 &nbsp;&nbsp;(예: "6,139")
+      </div>
+      <div style="padding:16px;background:#111;border-radius:8px;border:1px solid #1a1a1a;text-align:left;">
+        <p style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:6px;">문제 현황</p>
+        <p style="font-size:12px;color:#ef4444;margin-bottom:3px;">1. 같은 포스트 반복 열기 <span class="dim">— 아직 미해결</span></p>
+        <p style="font-size:12px;margin-bottom:3px;"><span style="text-decoration:line-through;color:#555;">2. 좋아요 수 못 읽기</span> <span class="accent">— 해결!</span></p>
+        <p style="font-size:12px;color:#ef4444;">3. "사진" 탭 위치 변동 <span class="dim">— 아직 미해결</span></p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div class="metric-row" style="justify-content:center;margin-bottom:24px;">
+        <div class="metric"><div class="val" style="color:#fbbf24;">9</div><div class="label">발견</div></div>
+        <div class="metric"><div class="val dim">3:30</div><div class="label">소요</div></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="compare-grid" style="max-width:280px;margin:0 auto;">
+          <div class="compare-cell">
+            <div class="compare-header">R2</div>
+            <p style="font-size:28px;font-weight:800;color:#ef4444;">?</p>
+            <p style="font-size:11px;color:#555;">좋아요 수 못 읽음</p>
+          </div>
+          <div class="compare-cell">
+            <div class="compare-header">R3</div>
+            <p style="font-size:28px;font-weight:800;color:#6ee7b7;">30.8만</p>
+            <p style="font-size:11px;color:#555;">코드 해독 성공</p>
+          </div>
+        </div>
+      </div>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r3_search.jpg" alt="R3 검색"></div>
+          <div class="phone-label">한국어 "명화 해설"도 시도</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r3_post2.jpg" alt="R3 포스트"></div>
+          <div class="phone-label">XML 분석 중</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5: R4 -->
+<div class="slide" data-idx="8" style="background:#050505;">
+  <div class="two-col-narrow">
+    <div>
+      <div class="overline">Round 4 — 전환점</div>
+      <h2 style="margin-bottom:16px;"><span class="yellow">12개</span> 발견,<br>첫 42만 좋아요 포착</h2>
+      <p style="font-size:13px;color:#6ee7b7;margin-bottom:16px;">
+        R1~R3의 문제들이 이번 라운드에서 모두 해결됨:
+      </p>
+      <div style="padding-left:16px;border-left:2px solid #6ee7b7;margin-bottom:20px;">
+        <p style="font-size:12px;color:#ccc;margin-bottom:4px;"><span style="text-decoration:line-through;color:#555;">같은 포스트 반복 열기</span> → <span class="accent">제목을 기억해서 중복 건너뛰기</span></p>
+        <p style="font-size:12px;color:#ccc;margin-bottom:4px;"><span style="text-decoration:line-through;color:#555;">좋아요 수 못 읽기</span> → <span class="accent">XML 코드 해독으로 완벽히 수집</span></p>
+        <p style="font-size:12px;color:#ccc;"><span style="text-decoration:line-through;color:#555;">"사진" 탭 위치 바뀜</span> → <span class="accent">매번 XML에서 동적으로 찾기</span></p>
+      </div>
+      <p style="margin-bottom:20px;">
+        문제를 다 해결하고 나니 전략을 바꿀 여유가 생겼습니다.<br>
+        <strong class="white">6개 검색어를 빠르게 돌아가며</strong> 탐색 — 넓게 훑는 방식.
+      </p>
+      <div class="insight">
+        <p><strong>Playbook에 기록:</strong><br>
+        "검색어 하나당 2~3개만 보고 다음으로.<br>
+        깊게 파기보다 넓게 훑는 게 훨씬 낫다."</p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div class="metric-row" style="justify-content:center;margin-bottom:24px;">
+        <div class="metric"><div class="val" style="color:#fbbf24;">12</div><div class="label">발견</div></div>
+        <div class="metric"><div class="val" style="color:#fbbf24;">42.1만</div><div class="label">최고 좋아요</div></div>
+      </div>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r4_start.jpg" alt="R4 시작"></div>
+          <div class="phone-label">빠르게 검색어 변경</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r4_hit.jpg" alt="R4 42만"></div>
+          <div class="phone-label">42.1만 좋아요 포착</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5: R5 -->
+<div class="slide" data-idx="9" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">Round 5 — 패턴 발견</div>
+      <h2 style="margin-bottom:16px;"><span class="accent">16개</span> — 검색어의 비밀</h2>
+      <p style="margin-bottom:24px;">
+        "impressionist painting", "Dutch Golden Age art"처럼<br>
+        <strong class="white">미술 시대 이름을 검색</strong>하면 결과가 <span class="accent">전부 고전명화</span>라는 걸 발견.
+      </p>
+      <p style="margin-bottom:24px;">
+        "art" 같은 넓은 단어는 현대미술, 일러스트도 섞이지만<br>
+        "impressionist painting"을 검색하는 사람은<br>
+        이미 고전명화에 관심 있는 사람뿐이라<br>
+        <strong class="white">검색 결과 자체가 이미 걸러진 상태</strong>인 것.
+      </p>
+      <div class="insight">
+        <p><strong>Playbook에 기록:</strong><br>
+        "검색어가 구체적일수록 결과가 정확하다.<br>
+        'famous painting'보다 'impressionist painting'이 2배 효율."</p>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:10px;color:#444;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">R5 — 실제로 찾은 포스트들</p>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r5_top.png" alt="R5 impressionist"></div>
+          <div class="phone-label">"impressionist painting"</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r5_monet.png" alt="R5 Dutch"></div>
+          <div class="phone-label">"Dutch Golden Age art"</div>
+        </div>
+      </div>
+      <div style="margin-top:20px;text-align:center;">
+        <p style="font-size:13px;color:#6ee7b7;font-weight:600;">두 검색어 모두 100% 적중</p>
+        <p style="font-size:12px;color:#555;">검색 결과 전체가 고전명화 콘텐츠</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6: R6 -->
+<div class="slide" data-idx="10" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">Round 6 — 공식 확정</div>
+      <h2 style="margin-bottom:16px;"><span class="accent">21개</span> 신기록</h2>
+      <p style="margin-bottom:24px;">
+        R5에서 "시대 이름"이 효과적이라는 걸 배웠으니<br>
+        이번엔 <strong class="white">화가 이름</strong>으로 검색해봤습니다.<br>
+        "Caravaggio painting" → 결과가 전부 카라바조 작품.
+      </p>
+      <p style="margin-bottom:24px;">
+        미켈란젤로, 보티첼리, 카라바조, 베르메르...<br>
+        <strong class="white">어떤 화가 이름을 넣든 100% 적중</strong>한다는 걸 확인.<br>
+        이 공식은 R7, R8에서도 계속 통했습니다.
+      </p>
+      <div class="insight">
+        <p><strong>최종 검색 공식:</strong><br>
+        <strong>"화가 이름 + painting"</strong> = 항상 100% 적중.</p>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:10px;color:#444;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">R6 — 화가 이름으로 검색한 결과</p>
+      <div class="phone-row">
+        <div>
+          <div class="phone-frame"><img src="slides/r6_waterhouse.png" alt="Waterhouse"></div>
+          <div class="phone-label">"pre raphaelite art"</div>
+        </div>
+        <div>
+          <div class="phone-frame"><img src="slides/r6_caravaggio.png" alt="Caravaggio"></div>
+          <div class="phone-label">"Caravaggio painting"</div>
+        </div>
+      </div>
+      <div class="metric-row" style="justify-content:center;margin-top:24px;">
+        <div class="metric"><div class="val accent">21</div><div class="label">발견</div></div>
+        <div class="metric"><div class="val yellow">13만</div><div class="label">최고 좋아요</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7: R7-R8 -->
+<div class="slide" data-idx="11" style="background:#050505;">
+  <div>
+    <div class="overline">Rounds 7–8 — 완성</div>
+    <h2 style="margin-bottom:8px;">R7에서 <span class="yellow">72만 좋아요</span> 콘텐츠 포착<br>R8에서 <span class="accent">24개</span> 역대 최다</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:24px;">
+      <div>
+        <p style="font-size:14px;color:#888;margin-bottom:16px;">
+          "Michelangelo art"를 검색했더니 72만 좋아요 포스트가 바로 나왔습니다.<br>
+          "Monet water lilies"처럼 화가 이름에 대표작까지 붙이면 더 정확.
+        </p>
+        <p style="font-size:14px;color:#888;margin-bottom:16px;">
+          R8에서는 5분 안에 7개 검색어를 전부 소화해서<br>
+          24개 포스트를 찾았습니다 — R1의 10개에서 <span class="accent">2.4배</span>.
+        </p>
+        <div class="insight">
+          <p><strong>최종 공식:</strong> "화가 이름 + 대표작" 검색.<br>
+          예: "Monet water lilies" → 5.9만 좋아요 포스트 즉시 발견.</p>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:10px;color:#444;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">R7~R8 캡처</p>
+        <div class="phone-row">
+          <div>
+            <div class="phone-frame"><img src="slides/r7_michelangelo.png" alt="72만"></div>
+            <div class="phone-label">72.2만 좋아요</div>
+          </div>
+          <div>
+            <div class="phone-frame"><img src="slides/r8_bosch.png" alt="Bosch"></div>
+            <div class="phone-label">Hieronymus Bosch</div>
+          </div>
+          <div>
+            <div class="phone-frame"><img src="slides/r8_raphael.png" alt="Raphael"></div>
+            <div class="phone-label">Raphael painting</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8: Chart -->
+<div class="slide" data-idx="12" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">Learning Curve</div>
+      <h2 style="margin-bottom:16px;">같은 5분인데<br><span class="accent">2.4배</span> 더 많이 찾는다</h2>
+      <p style="margin-bottom:24px;">
+        R1에서 10개 → R8에서 24개.<br>
+        주어진 시간은 똑같이 5분.<br>
+        <strong class="white">달라진 건 쌓인 경험뿐.</strong>
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <p style="font-size:13px;"><span class="red">R1~R3</span> <span style="color:#666;">기초 — 화면 조작법 익히기, 데이터 읽기</span></p>
+        <p style="font-size:13px;"><span class="yellow">R4</span> <span style="color:#666;">전환 — 검색어를 자주 바꾸는 전략</span></p>
+        <p style="font-size:13px;"><span class="accent">R5~R6</span> <span style="color:#666;">발견 — "화가 이름 = 100% 적중" 공식</span></p>
+        <p style="font-size:13px;"><span class="accent">R7~R8</span> <span style="color:#666;">완성 — 5분에 7개 검색어, 24개 수집</span></p>
+      </div>
+    </div>
+    <div>
+      <canvas id="mainChart" height="280"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- 9: Playbook Deep Dive -->
+<div class="slide" data-idx="13" style="background:#050505;">
+  <div class="two-col">
+    <div>
+      <div class="overline">Playbook — 실제 기록</div>
+      <h2 style="margin-bottom:16px;">AI가 직접 쓴 노트에서<br>극적인 변화가 일어난 순간들</h2>
+      <p style="margin-bottom:20px;">
+        Playbook은 처음에 전부 "?"였습니다.<br>
+        라운드가 지나면서 하나씩 답이 채워졌고,<br>
+        <strong class="white">특히 3번의 결정적 순간</strong>이 성능을 크게 바꿨습니다.
+      </p>
+      <p style="font-size:12px;color:#555;">
+        각 항목을 클릭하면 AI가 실제로 쓴 Playbook 원문을 볼 수 있습니다.
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div class="playbook-entry" style="border-color:#ef444444;cursor:pointer;" onclick="this.querySelector('.pb-raw').classList.toggle('pb-open')">
+        <div class="playbook-round">R3 — 첫 번째 돌파 <span style="color:#333;font-size:9px;margin-left:4px;">click to expand</span></div>
+        <div class="playbook-content">
+          <span class="r">문제:</span> 좋아요 수를 읽을 수 없음<br>
+          <span class="g">해결:</span> TikTok XML의 숨겨진 코드를 해독.<br>
+          <strong>"qmd"가 좋아요 수, "qmi"가 공유 수</strong>라는 걸 알아냄.<br>
+          → 이후 모든 라운드에서 데이터 수집 가능
+        </div>
+        <div class="pb-raw" style="display:none;margin-top:10px;padding:12px;background:#0a0a0a;border-radius:6px;border:1px solid #1a1a1a;font-family:'SF Mono','Fira Code',monospace;font-size:10px;color:#666;line-height:1.7;max-height:140px;overflow-y:auto;">
+Engagement 데이터 수집 ✅ SOLVED in R3<br>
+- 문제: R2에서 모든 포스트의 likes/comments/shares/saves가 빈 값<br>
+- 원인: collect_post_data()가 "like", "comment" 등 영문 키워드로 resource_id를 찾았으나, 실제 TikTok resource_id는 짧은 코드<br>
+- 해결 (R3): 포스트 상세 UI dump 분석으로 정확한 resource_id 매핑 확인:<br>
+&nbsp;&nbsp;• <span style="color:#6ee7b7;">qmd</span> = 좋아요 수 (likes) — 예: "31.6만"<br>
+&nbsp;&nbsp;• <span style="color:#6ee7b7;">qm_</span> = 댓글 수 (comments) — 예: "1,995"<br>
+&nbsp;&nbsp;• <span style="color:#6ee7b7;">qmi</span> = 공유 수 (shares) — 예: "4.3만"<br>
+&nbsp;&nbsp;• <span style="color:#6ee7b7;">qml</span> = 저장 수 (saves) — 예: "2.2만"<br>
+&nbsp;&nbsp;• <span style="color:#6ee7b7;">izl</span> = 계정 이름 (account name)<br>
+- R4부터 적용: collect_engagement_v2() 함수로 rid.endswith("/qmd") 등으로 정확히 매칭
+        </div>
+      </div>
+      <div class="playbook-entry" style="border-color:#fbbf2444;cursor:pointer;" onclick="this.querySelector('.pb-raw').classList.toggle('pb-open')">
+        <div class="playbook-round">R4 — 전략 전환 <span style="color:#333;font-size:9px;margin-left:4px;">click to expand</span></div>
+        <div class="playbook-content">
+          <span class="r">문제:</span> 같은 검색어로 계속 찾으면 중복만 쌓임<br>
+          <span class="g">해결:</span> <strong>"검색어당 2~3개만 보고 바로 다음 검색어로 넘어가자"</strong><br>
+          → 수집량 10개 → 12개 (20% 향상)
+        </div>
+        <div class="pb-raw" style="display:none;margin-top:10px;padding:12px;background:#0a0a0a;border-radius:6px;border:1px solid #1a1a1a;font-family:'SF Mono','Fira Code',monospace;font-size:10px;color:#666;line-height:1.7;max-height:140px;overflow-y:auto;">
+R4 핵심 교훈:<br>
+1. ✅ 최고 효율 달성: 12 unique / 5분.<br>
+&nbsp;&nbsp;빠른 키워드 전환(6개 키워드, 각 max 4회) + cross-round 중복 감지 전략이 효과적.<br>
+2. ✅ Engagement v2 수집 성공: 42.1만, 29.4만, 15.7만, 14.7만 등 대형 포스트 engagement 정확히 수집.<br>
+3. 모든 키워드 50% 히트율: 다양한 영어 키워드가 고르게 효율적.<br>
+4. 한국어 키워드 효율 하락: "명화 해설"→"Art lore"로 자동 번역되어 판타지 콘텐츠 혼입. 영어가 더 예측 가능.<br>
+5. 그리드 Row 1만 유효: Row 2(y=700)는 항상 Row 1 중복. 키워드 전환이 스크롤보다 효율적.
+        </div>
+      </div>
+      <div class="playbook-entry" style="border-color:#6ee7b744;cursor:pointer;" onclick="this.querySelector('.pb-raw').classList.toggle('pb-open')">
+        <div class="playbook-round">R5 — 핵심 발견 <span style="color:#333;font-size:9px;margin-left:4px;">click to expand</span></div>
+        <div class="playbook-content">
+          <span class="r">시도:</span> "impressionist painting", "Dutch Golden Age art" 검색<br>
+          <span class="g">결과:</span> <strong>100% 적중! 검색 결과 전체가 고전명화</strong><br>
+          → "화가/시대 이름 + painting" 공식 확립. 수집량 16개 → 24개로 급증
+        </div>
+        <div class="pb-raw" style="display:none;margin-top:10px;padding:12px;background:#0a0a0a;border-radius:6px;border:1px solid #1a1a1a;font-family:'SF Mono','Fira Code',monospace;font-size:10px;color:#666;line-height:1.7;max-height:140px;overflow-y:auto;">
+Keyword Experiments (R5):<br>
+| impressionist painting | R5 | 4/4 | 100% | 20.6만 (soo_art_decoo) | ★최고 히트율! 모든 4개 유니크. Monet, 인상파 콘텐츠 풍부. |<br>
+| famous portrait history | R5 | 4/4 | 100% | 4,535 (emalamenart) | ★100% 히트율. 초상화 특화. |<br>
+| Dutch Golden Age art | R5 | 4/4 | 100% | 6.2만 (pocket.art.gallery) | ★100% 히트율. Vermeer, Dutch masters. |<br><br>
+R5 핵심 교훈:<br>
+1. 🏆 신기록 16 unique / 5분. Row 2 스크롤 전략 성공으로 키워드당 최대 4개 확보.<br>
+2. 시대별/장르별 키워드가 100% 히트율: 구체적 시대/장르가 필터 역할.<br>
+3. Row 2 스크롤 전략 유효: adb_swipe(450, 1200, 450, 600, 400) 후 새 포스트 확보.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 10: End -->
+<div class="slide" data-idx="14" style="background:linear-gradient(160deg,#050505,#0a0a0a);">
+  <div class="two-col">
+    <div>
+      <div class="overline">Result</div>
+      <h1 style="margin-bottom:32px;">8라운드, 40분.<br><span class="accent">스스로 진화하는</span> 스카웃.</h1>
+      <div class="metric-row" style="margin-bottom:32px;">
+        <div class="metric"><div class="val">117</div><div class="label">수집 포스트</div></div>
+        <div class="metric"><div class="val accent">24</div><div class="label">최고 기록</div></div>
+        <div class="metric"><div class="val yellow">72만</div><div class="label">최고 좋아요</div></div>
+        <div class="metric"><div class="val">0</div><div class="label">차단 횟수</div></div>
+      </div>
+      <p class="large-p">
+        이 Playbook은 이제 매일 자동으로 돌아가며<br>
+        트렌드 발견 → 분석 → 콘텐츠 제작까지 연결됩니다.
+      </p>
+    </div>
+    <div style="text-align:center;">
+      <p style="font-size:10px;color:#444;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">
+        R8 실제 스카웃 영상 — 5분에 24개 수집
+      </p>
+      <div class="video-wrapper" id="videoWrapper" style="display:inline-block;position:relative;">
+        <video
+          id="r8video"
+          src="slides/scout_r8_small.mp4"
+          style="width:220px;height:440px;border-radius:20px;border:1.5px solid #2a2a2a;object-fit:cover;background:#000;"
+          muted playsinline
+        ></video>
+        <div id="videoControls" style="
+          position:absolute; bottom:24px; left:10px; right:10px;
+          background:rgba(0,0,0,0.75); backdrop-filter:blur(8px);
+          border-radius:10px; padding:8px 12px;
+          opacity:0; transition:opacity 0.3s;
+        ">
+          <div id="progressBar" style="
+            width:100%; height:3px; background:#333; border-radius:2px;
+            cursor:pointer; margin-bottom:6px; position:relative;
+          ">
+            <div id="progressFill" style="height:100%;background:#6ee7b7;border-radius:2px;width:0%;transition:width 0.1s;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button id="playPauseBtn" style="
+              background:none;border:none;color:#fff;cursor:pointer;
+              font-size:12px;padding:0;width:20px;
+            ">||</button>
+            <span id="videoTime" style="font-size:10px;color:#666;font-variant-numeric:tabular-nums;">0:10 / 5:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <span class="counter" id="counter">1 / 11</span>
+  <button id="prev">&#8592;</button>
+  <button id="next">&#8594;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+const total = slides.length;
+
+function showSlide(n) {
+  slides[current].classList.remove('active');
+  current = (n + total) % total;
+  slides[current].classList.add('active');
+  document.getElementById('counter').textContent = `${current+1} / ${total}`;
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===current));
+}
+
+const dotsEl = document.getElementById('dots');
+for (let i=0; i<total; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = () => showSlide(i);
+  dotsEl.appendChild(d);
+}
+
+document.getElementById('prev').onclick = () => showSlide(current-1);
+document.getElementById('next').onclick = () => showSlide(current+1);
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); showSlide(current+1); }
+  if (e.key==='ArrowLeft') showSlide(current-1);
+});
+
+// R8 Video player
+const vid = document.getElementById('r8video');
+const wrapper = document.getElementById('videoWrapper');
+const controls = document.getElementById('videoControls');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const videoTime = document.getElementById('videoTime');
+let isPlaying = false;
+
+function fmt(s) { return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+
+vid.addEventListener('loadedmetadata', () => { vid.currentTime = 10; vid.play(); isPlaying = true; });
+vid.addEventListener('timeupdate', () => {
+  if(vid.duration) {
+    progressFill.style.width = (vid.currentTime/vid.duration*100)+'%';
+    videoTime.textContent = fmt(vid.currentTime)+' / '+fmt(vid.duration);
+  }
+});
+
+wrapper.addEventListener('mouseenter', () => { controls.style.opacity = '1'; });
+wrapper.addEventListener('mouseleave', () => { controls.style.opacity = '0'; });
+
+playPauseBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(isPlaying) { vid.pause(); playPauseBtn.textContent='▶'; }
+  else { vid.play(); playPauseBtn.textContent='||'; }
+  isPlaying = !isPlaying;
+});
+
+progressBar.addEventListener('click', (e) => {
+  const rect = progressBar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  vid.currentTime = pct * vid.duration;
+});
+
+// Chart
+const data = [10,7,9,12,16,21,18,24];
+const colors = data.map(v => v>=20?'#6ee7b7':v>=12?'#fbbf24':'#ef4444');
+
+new Chart(document.getElementById('mainChart'), {
+  type:'bar',
+  data:{
+    labels:['R1','R2','R3','R4','R5','R6','R7','R8'],
+    datasets:[{
+      data,
+      backgroundColor: colors,
+      borderRadius:6,
+      barPercentage:0.55
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        callbacks:{
+          afterLabel:(ctx)=>{
+            const notes = [
+              '첫 시도. 기본 조작 학습.',
+              '데이터 읽기 실패.',
+              '화면 코드 해독 성공!',
+              '전환점. 넓게 훑는 전략.',
+              '100% 적중 검색어 발견!',
+              '화가 이름 공식 확정.',
+              '72만 좋아요 포착!',
+              '역대 최다. 5분에 24개.'
+            ];
+            return notes[ctx.dataIndex];
+          }
+        }
+      }
+    },
+    scales:{
+      x:{grid:{color:'#181818'},ticks:{color:'#666',font:{size:13,weight:600}}},
+      y:{grid:{color:'#181818'},ticks:{color:'#333'},beginAtZero:true,
+        title:{display:true,text:'발견한 포스트 수',color:'#444',font:{size:11}}}
+    }
+  }
+});
+</script>
+</body>
+</html>
