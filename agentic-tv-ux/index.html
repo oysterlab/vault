@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에이전트 TV UX 경쟁사 동향 리포트</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 15px; }
+  body { font-family: 'Pretendard', -apple-system, sans-serif; background: #fafbfc; color: #1a1a2e; line-height: 1.7; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.25; }
+  .meta { color: #6b7280; font-size: 0.85rem; margin-bottom: 32px; line-height: 1.6; }
+  .meta strong { color: #1a1a2e; }
+  .summary-box { background: #1e293b; color: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 40px; font-size: 0.95rem; line-height: 1.65; }
+  .summary-box strong { color: #60a5fa; }
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 40px 0; }
+  h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; margin-top: 8px; }
+  h3 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 12px; margin-top: 28px; color: #1e293b; }
+  p { margin-bottom: 14px; }
+  strong { font-weight: 700; }
+  ul, ol { margin-bottom: 14px; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
+  th { background: #f1f5f9; text-align: left; padding: 10px 12px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: #475569; border-bottom: 2px solid #e2e8f0; }
+  td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:hover td { background: #f8fafc; }
+  a { color: #2563eb; text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+  .card h3 { margin-top: 0; }
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; margin-right: 6px; }
+  .tag-shipped { background: #dcfce7; color: #166534; }
+  .tag-demo { background: #dbeafe; color: #1e40af; }
+  .tag-concept { background: #fef3c7; color: #92400e; }
+  .tag-none { background: #fee2e2; color: #991b1b; }
+  .fact-table td:first-child { font-weight: 700; width: 40%; }
+  .fact-table .status { font-weight: 700; }
+  .ref-table td:first-child { text-align: center; width: 30px; color: #94a3b8; }
+  .ref-table td:nth-child(3) { width: 60px; }
+  .back { display: inline-block; margin-bottom: 24px; color: #6b7280; font-size: 0.85rem; }
+  .back:hover { color: #2563eb; }
+  .scenario-label { font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a href="../" class="back">&larr; Vault</a>
+
+<h1>글로벌 경쟁사의 에이전트 TV UX 동향 및 시사점</h1>
+<div class="meta">
+  <strong>작성일:</strong> 2026년 4월 &nbsp;|&nbsp;
+  <strong>대상:</strong> UX 전략 및 선행 개발 부문 임원진
+</div>
+
+<div class="summary-box">
+  기존 AI 비서(Command-Response) 시대 종결. OS 레벨에서 화면을 직접 보고 조작하는 <strong>'자율형 에이전트(Agentic AI)'</strong> 기반의 실행형 UX로 패러다임 전환 중.
+</div>
+
+<h2>1. 패러다임 시프트: 'Chat'에서 'Do'로</h2>
+<p>중국 내수 시장을 중심으로 사용자의 명령을 수행하기 위해 '앱을 실행'하는 단계를 넘어 <strong>'화면을 직접 조작(Computer Use)'</strong>하는 단계에 진입하고 있다.</p>
+
+<table>
+  <thead><tr><th>구분</th><th>기존 AI 비서 (Legacy)</th><th>에이전트 기반 (Agentic)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>핵심 기술</strong></td><td>NLP + 사전 정의 API 연동</td><td><strong>Reasoning + GUI 인식/제어</strong></td></tr>
+    <tr><td><strong>상호작용</strong></td><td>"찾아줘", "틀어줘" (수동적)</td><td><strong>"해결해줘", "담아줘" (자율적)</strong></td></tr>
+    <tr><td><strong>앱 생태계</strong></td><td>TV 전용 앱 설치 필수</td><td><strong>기기 간 앱 공유 및 대리 조작</strong></td></tr>
+    <tr><td><strong>UX 지향점</strong></td><td>정확한 응답 (Accuracy)</td><td><strong>완벽한 과업 완수 (Task Completion)</strong></td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>2. 실제 사례: 누가, 무엇을 출시했는가</h2>
+
+<!-- 2-1 MiClaw -->
+<div class="card">
+  <h3>2-1. 샤오미 MiClaw — 폰 에이전트가 TV를 제어하는 구조</h3>
+  <p><span class="tag tag-shipped">출시</span> 2026년 3월 6일 클로즈드 베타</p>
+  <p>폰에서 동작하는 자율형 에이전트가 TV를 포함한 스마트홈 기기를 크로스디바이스로 제어. TV 자체에서 에이전트가 돌지는 않지만, <strong>폰 에이전트가 TV를 대리 조작</strong>하는 구조.</p>
+  <p><strong>킬러 시나리오:</strong></p>
+  <ul>
+    <li>"어젯밤 영화 이어봐" → TV 켜기 → 스트리밍 앱 → 영화 찾기 → 이어 재생 → 조명 어둡게 → 폰 무음까지 자동</li>
+    <li>에이전트가 <strong>화면 픽셀을 보고 탭/스와이프</strong>하여 앱 조작 (Computer Use)</li>
+    <li>Mi Home 연결 10억+ 기기 제어</li>
+  </ul>
+  <table>
+    <thead><tr><th>자료</th><th>링크</th></tr></thead>
+    <tbody>
+      <tr><td>MiClaw 15분 데모 (스마트홈 전체 제어, 120만 뷰)</td><td><a href="https://www.bilibili.com/video/BV14vPfzMEwN/" target="_blank">Bilibili 영상</a></td></tr>
+      <tr><td>MiClaw 베타 오버뷰 (5분)</td><td><a href="https://www.bilibili.com/video/BV1sbPnzZESs/" target="_blank">Bilibili 영상</a></td></tr>
+      <tr><td>MiClaw 첫 체험기 (카메라, SMS 정리)</td><td><a href="https://www.bilibili.com/video/BV1YzPWzUEsk/" target="_blank">Bilibili 영상</a></td></tr>
+      <tr><td>레이쥔 웨이보 공식 데모</td><td><a href="https://weibo.com/1749127163/5273442804304186" target="_blank">Weibo</a></td></tr>
+      <tr><td>MiClaw 인터페이스 스크린샷 6장</td><td><a href="https://www.mundoxiaomi.com/moviles/miclaw-nueva-ia-para-tu-movil-xiaomi-asi-impresionante-algunos-usos-brutales-que-tiene-video" target="_blank">MundoXiaomi</a></td></tr>
+      <tr><td>MiClaw 아키텍처/데모 이미지 18장</td><td><a href="https://news.qq.com/rain/a/20260309A0783W00" target="_blank">Tencent News</a></td></tr>
+    </tbody>
+  </table>
+  <p><strong>전략적 시사점:</strong> TV용 앱이 없어도 폰 앱을 에이전트가 대리 수행하고 결과를 TV에 노출. TV 앱 생태계 부족 문제를 우회.</p>
+</div>
+
+<!-- 2-2 Hisense -->
+<div class="card">
+  <h3>2-2. 하이센스 — TV 네이티브 12개 AI 에이전트 + DeepSeek</h3>
+  <p><span class="tag tag-shipped">출시</span> 2025년 하이센스 E7N 시리즈</p>
+  <p>세계 최초로 <strong>DeepSeek R1(심층 추론) + V3(효율 응답)</strong> 이중 모드를 TV에 탑재. 12개 전문 에이전트가 TV 안에서 직접 동작.</p>
+  <p><strong>12개 에이전트:</strong> 영화 전문가, 게이밍 어시스턴트, 스포츠 에이전트, 요리 마스터, 교육 에이전트, 음악 에이전트 등. 리모컨 AI 버튼으로 호출. TV가 컨텐츠를 인식하고 맥락에 맞는 에이전트를 자동 활성화.</p>
+  <table>
+    <thead><tr><th>자료</th><th>링크</th></tr></thead>
+    <tbody>
+      <tr><td>하이센스 12개 AI 에이전트 소개 (영문)</td><td><a href="https://www.aibase.com/news/12133" target="_blank">AIBase</a></td></tr>
+      <tr><td>하이센스 DeepSeek 통합 발표 (영문)</td><td><a href="https://www.aibase.com/news/15300" target="_blank">AIBase</a></td></tr>
+      <tr><td>하이센스 DeepSeek TV 공식 보도 (신화통신)</td><td><a href="http://www.news.cn/tech/20250212/d1695a99d9f245b5826335ce77054416/c.html" target="_blank">Xinhua</a></td></tr>
+      <tr><td>하이센스 12 에이전트 상세 분석 (중문)</td><td><a href="https://time-weekly.com/post/315097" target="_blank">Time Weekly</a></td></tr>
+      <tr><td>DeepSeek on Hisense TV 심층 분석</td><td><a href="https://zhuanlan.zhihu.com/p/26192654948" target="_blank">Zhihu</a></td></tr>
+      <tr><td>하이센스 CES 2026 풀시나리오 스마트홈</td><td><a href="https://www.prnewswire.com/news-releases/hisense-showcases-a-full-scenario-smart-home-ecosystem-at-ces-2026-302654727.html" target="_blank">PR Newswire</a></td></tr>
+      <tr><td>하이센스 ConnectLife AI Agent Suite</td><td><a href="https://gizmodo.com/hisenses-ai-agent-suite-brings-connection-and-emotional-value-to-smart-home-appliances-2000729477" target="_blank">Gizmodo</a></td></tr>
+    </tbody>
+  </table>
+  <p><strong>전략적 시사점:</strong> 삼성 VAC가 팝업+블랙스크린으로 부정 96%인 동안, 하이센스는 TV 네이티브 에이전트 12개를 이미 출시.</p>
+</div>
+
+<!-- 2-3 SoundHound -->
+<div class="card">
+  <h3>2-3. SoundHound Amelia 7 — TV에서 음식 주문/예약 실행</h3>
+  <p><span class="tag tag-demo">CES 2026 데모</span></p>
+  <p>TV에서 음성으로 음식 주문, 레스토랑 예약(OpenTable), 주차 결제(Parkopedia), 티켓 예매를 에이전트가 자율 수행.</p>
+  <table>
+    <thead><tr><th>자료</th><th>링크</th></tr></thead>
+    <tbody>
+      <tr><td>CES 2026 리캡 영상 (실제 TV 데모 포함)</td><td><a href="https://www.soundhound.com/ces-2026-recap-video/" target="_blank">SoundHound 영상</a></td></tr>
+      <tr><td>CES 2026 프레스 릴리스</td><td><a href="https://www.soundhound.com/newsroom/press-releases/ces-2026-soundhound-ai-unveils-agentic-voice-commerce-for-vehicles-and-tvs-with-ai-agents-that-order-food-make-dinner-reservations-pay-for-parking-and-book-tickets-on-the-go/" target="_blank">SoundHound PR</a></td></tr>
+    </tbody>
+  </table>
+  <p><strong>전략적 시사점:</strong> TV에서 실제 결제+주문까지 완수하는 "실행형 에이전트". TV가 커머스 터미널로 전환.</p>
+</div>
+
+<!-- 2-4 YouTube Ask -->
+<div class="card">
+  <h3>2-4. YouTube Ask — TV에서 영상 속 질문</h3>
+  <p><span class="tag tag-shipped">출시</span> 2026년 2월 &nbsp;|&nbsp; 2,000만+ 사용자</p>
+  <p>YouTube TV 앱에서 "Ask" 버튼을 눌러 시청 중인 영상에 대해 AI에게 질문.</p>
+  <table>
+    <thead><tr><th>자료</th><th>링크</th></tr></thead>
+    <tbody>
+      <tr><td>YouTube Ask on TV 상세</td><td><a href="https://techcrunch.com/2026/02/19/youtubes-latest-experiment-brings-its-conversational-ai-tool-to-tvs/" target="_blank">TechCrunch</a></td></tr>
+    </tbody>
+  </table>
+  <p><strong>전략적 시사점:</strong> OEM이 아닌 서비스사(Google/YouTube)가 TV AI UX 주도권을 가져가는 모델.</p>
+</div>
+
+<!-- 2-5 LG + A2UI -->
+<div class="card">
+  <h3>2-5. LG Agent Appliances + Google A2UI</h3>
+  <p><span class="tag tag-demo">CES 2026 발표</span></p>
+  <p>LG는 모든 가전을 '에이전트 가전'으로 정의. TV(webOS/ThinQ)가 사용자를 학습하고 다른 기기와 자율 협조.</p>
+  <p><strong>Google A2UI:</strong> 에이전트가 플랫폼별 네이티브 UI를 자동 생성하는 오픈 프로토콜. TV 포함 크로스플랫폼 설계.</p>
+  <table>
+    <thead><tr><th>자료</th><th>링크</th></tr></thead>
+    <tbody>
+      <tr><td>LG CES 2026 Agent Appliances</td><td><a href="https://www.lg.com/global/newsroom/news/corporate/lg-electronics-unveils-its-approach-to-ai-in-action/" target="_blank">LG Newsroom</a></td></tr>
+      <tr><td>Google A2UI 공식 사이트</td><td><a href="https://a2ui.org/" target="_blank">a2ui.org</a></td></tr>
+      <tr><td>A2UI GitHub</td><td><a href="https://github.com/google/A2UI" target="_blank">GitHub</a></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<h2>3. 아직 없는 것 (Fact Check)</h2>
+<p>보고서의 정직성을 위해 명시:</p>
+<table class="fact-table">
+  <thead><tr><th>시나리오</th><th>현황</th></tr></thead>
+  <tbody>
+    <tr><td>TV 화면에서 에이전트 작업 과정을 PIP로 중계</td><td><span class="tag tag-none">공개 구현 없음</span> 디자인 패턴으로만 존재 (<a href="https://www.aiuxdesign.guide/patterns/agent-status-monitoring" target="_blank">aiuxdesign.guide</a>)</td></tr>
+    <tr><td>화웨이 HarmonyOS TV에서 Computer Use 에이전트</td><td><span class="tag tag-none">공개 증거 없음</span> 小艺는 음성 어시스턴트 수준</td></tr>
+    <tr><td>OpenClaw가 TV UI를 네이티브로 제어</td><td><span class="tag tag-none">없음</span> Home Assistant 통해 IoT로 TV 제어하는 수준</td></tr>
+    <tr><td>사용자가 소파에 앉으면 에이전트가 브리핑</td><td><span class="tag tag-concept">컨셉 수준</span> 앰비언트 모드는 있으나 에이전트 브리핑은 아님</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>4. 빅 스크린 킬러 시나리오 분석</h2>
+<p>실제 출시/데모된 사례를 기반으로 정리:</p>
+
+<div class="card">
+  <div class="scenario-label">Scenario A</div>
+  <h3>앱 설치 없는 서비스 확장 (Ecosystem Bypass)</h3>
+  <p><strong>실증:</strong> 샤오미 MiClaw — 폰 에이전트가 타오바오 등 폰 앱을 백그라운드에서 대리 조작. 화면 픽셀을 보고 탭/스와이프. 결과를 TV에 캐스팅.</p>
+  <p><strong>영상:</strong> <a href="https://www.bilibili.com/video/BV14vPfzMEwN/" target="_blank">Bilibili 15분 데모</a></p>
+  <p><strong>삼성 대응:</strong> 갤럭시-TV 연결성을 활용, 갤럭시 앱을 TV 에이전트가 원격 대리 수행.</p>
+</div>
+
+<div class="card">
+  <div class="scenario-label">Scenario B</div>
+  <h3>TV 네이티브 전문 에이전트 (Specialized Agents)</h3>
+  <p><strong>실증:</strong> 하이센스 E7N — 시청 컨텐츠 인식 → 맥락별 에이전트 자동 활성화 (영화→영화 전문가, 게임→게이밍 어시스턴트)</p>
+  <p><strong>기사:</strong> <a href="https://www.aibase.com/news/12133" target="_blank">AIBase</a>, <a href="https://time-weekly.com/post/315097" target="_blank">Time Weekly</a></p>
+  <p><strong>삼성 대응:</strong> VAC를 단일 기능이 아닌 <strong>전문 에이전트 파이프라인</strong>으로 재설계.</p>
+</div>
+
+<div class="card">
+  <div class="scenario-label">Scenario C</div>
+  <h3>TV 커머스 실행 (Agentic Commerce)</h3>
+  <p><strong>실증:</strong> SoundHound Amelia 7 — "피자 주문해" → 에이전트가 결제까지 자율 수행.</p>
+  <p><strong>영상:</strong> <a href="https://www.soundhound.com/ces-2026-recap-video/" target="_blank">SoundHound CES 리캡</a></p>
+  <p><strong>삼성 대응:</strong> SmartThings + Samsung Pay 연동으로 TV 커머스 실행 환경 구축.</p>
+</div>
+
+<hr>
+
+<h2>5. 시사점 (VI Group 대응 방향)</h2>
+<ol>
+  <li><strong>'API 연동'에서 'GUI 제어'로의 전환</strong> — 서비스사 API 협조에만 매달릴 것이 아니라 <strong>'Pixel-to-Action'</strong> 기술 확보 시급. 샤오미 MiClaw가 이미 상용화.</li>
+  <li><strong>Vibe Coding 기반 다이내믹 UI</strong> — 고정 TV 메뉴를 버리고 에이전트가 실시간 생성하는 <strong>'Generative UI'</strong> 체계 필요. Google A2UI가 오픈 표준으로 부상.</li>
+  <li><strong>Cross-Device 실행 환경</strong> — 갤럭시-TV 연결성을 활용, 모바일 앱을 TV 에이전트가 원격 '대리 수행'하는 워크플로우 구축.</li>
+  <li><strong>VAC 리포지셔닝 시급</strong> — Reddit 부정률 96%, 긍정 0%. 하이센스가 12개 전문 에이전트를 이미 출시한 상황에서 "팝업 AI"로는 경쟁 불가. <a href="../vac-vs-tcl/">VAC vs TCL Gemini 비교 분석 참조</a></li>
+</ol>
+
+<hr>
+
+<h2>6. 제언</h2>
+<p>하이센스는 이미 <strong>'전문 에이전트 12개'</strong>를 TV에 탑재했고, 샤오미는 <strong>폰 에이전트가 TV를 포함한 전체 생태계를 대리 조작</strong>하는 구조를 출시했다.</p>
+<p>삼성 역시 TV를 단순한 'Content Player'가 아닌, 집안의 모든 디지털 과업을 중계하고 관리하는 <strong>'Master Agent Hub'</strong>로 정의하고, 에이전트의 작업 과정을 TV 특유의 대화면으로 우아하게 시각화하는 독자적인 <strong>Agentic UI</strong> 표준을 선점해야 한다.</p>
+<p>단, PIP 작업 중계, 프로액티브 브리핑 등 일부 시나리오는 아직 어느 경쟁사도 출시하지 않은 <strong>선점 가능 영역</strong>이다. 여기서 PoC를 빠르게 만들어 차별화할 수 있다.</p>
+
+<hr>
+
+<h2>참고 자료</h2>
+<table class="ref-table">
+  <thead><tr><th>#</th><th>자료명</th><th>유형</th><th>링크</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>샤오미 MiClaw 스마트홈 데모 (15분, 120만 뷰)</td><td>영상</td><td><a href="https://www.bilibili.com/video/BV14vPfzMEwN/" target="_blank">Bilibili</a></td></tr>
+    <tr><td>2</td><td>샤오미 MiClaw 베타 오버뷰 (5분)</td><td>영상</td><td><a href="https://www.bilibili.com/video/BV1sbPnzZESs/" target="_blank">Bilibili</a></td></tr>
+    <tr><td>3</td><td>샤오미 MiClaw 첫 체험기</td><td>영상</td><td><a href="https://www.bilibili.com/video/BV1YzPWzUEsk/" target="_blank">Bilibili</a></td></tr>
+    <tr><td>4</td><td>레이쥔 공식 데모</td><td>영상</td><td><a href="https://weibo.com/1749127163/5273442804304186" target="_blank">Weibo</a></td></tr>
+    <tr><td>5</td><td>MiClaw 인터페이스 스크린샷 6장</td><td>이미지</td><td><a href="https://www.mundoxiaomi.com/moviles/miclaw-nueva-ia-para-tu-movil-xiaomi-asi-impresionante-algunos-usos-brutales-que-tiene-video" target="_blank">MundoXiaomi</a></td></tr>
+    <tr><td>6</td><td>MiClaw 아키텍처/데모 이미지 18장</td><td>이미지</td><td><a href="https://news.qq.com/rain/a/20260309A0783W00" target="_blank">Tencent News</a></td></tr>
+    <tr><td>7</td><td>하이센스 12개 AI 에이전트</td><td>기사</td><td><a href="https://www.aibase.com/news/12133" target="_blank">AIBase</a></td></tr>
+    <tr><td>8</td><td>하이센스 DeepSeek 통합</td><td>기사</td><td><a href="https://www.aibase.com/news/15300" target="_blank">AIBase</a></td></tr>
+    <tr><td>9</td><td>하이센스 TV DeepSeek (신화통신)</td><td>기사</td><td><a href="http://www.news.cn/tech/20250212/d1695a99d9f245b5826335ce77054416/c.html" target="_blank">Xinhua</a></td></tr>
+    <tr><td>10</td><td>SoundHound CES 2026 리캡</td><td>영상</td><td><a href="https://www.soundhound.com/ces-2026-recap-video/" target="_blank">SoundHound</a></td></tr>
+    <tr><td>11</td><td>SoundHound CES 2026 프레스 릴리스</td><td>기사</td><td><a href="https://www.soundhound.com/newsroom/press-releases/ces-2026-soundhound-ai-unveils-agentic-voice-commerce-for-vehicles-and-tvs-with-ai-agents-that-order-food-make-dinner-reservations-pay-for-parking-and-book-tickets-on-the-go/" target="_blank">SoundHound PR</a></td></tr>
+    <tr><td>12</td><td>YouTube Ask on TV</td><td>기사</td><td><a href="https://techcrunch.com/2026/02/19/youtubes-latest-experiment-brings-its-conversational-ai-tool-to-tvs/" target="_blank">TechCrunch</a></td></tr>
+    <tr><td>13</td><td>LG Agent Appliances (CES 2026)</td><td>기사</td><td><a href="https://www.lg.com/global/newsroom/news/corporate/lg-electronics-unveils-its-approach-to-ai-in-action/" target="_blank">LG Newsroom</a></td></tr>
+    <tr><td>14</td><td>Google A2UI 오픈 프로토콜</td><td>사이트</td><td><a href="https://a2ui.org/" target="_blank">a2ui.org</a></td></tr>
+    <tr><td>15</td><td>Agent Status Monitoring UX 패턴</td><td>디자인</td><td><a href="https://www.aiuxdesign.guide/patterns/agent-status-monitoring" target="_blank">aiuxdesign.guide</a></td></tr>
+    <tr><td>16</td><td>하이센스 CES 2026 풀시나리오</td><td>기사</td><td><a href="https://www.prnewswire.com/news-releases/hisense-showcases-a-full-scenario-smart-home-ecosystem-at-ces-2026-302654727.html" target="_blank">PR Newswire</a></td></tr>
+    <tr><td>17</td><td>중국 AI TV 시장 보고서</td><td>리포트</td><td><a href="https://www.miaozhen.com/all-reports/11379.html" target="_blank">Miaozhen</a></td></tr>
+    <tr><td>18</td><td>Samsung VAC vs TCL Gemini 비교</td><td>슬라이드</td><td><a href="../vac-vs-tcl/">GitHub Pages</a></td></tr>
+  </tbody>
+</table>
+
+</div>
+</body>
+</html>
